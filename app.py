@@ -1,4 +1,5 @@
 from flask import Flask
+import temp
 import json
 import socketserver
 import sys
@@ -17,8 +18,8 @@ user_info = db["user-credentials"]
 token_storage = db["authentication-tokens"]
 
 @app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+def home():
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
