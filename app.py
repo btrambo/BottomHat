@@ -3,23 +3,45 @@ from pymongo import MongoClient
 import bcrypt
 import secrets
 import hashlib
+from bson.json_util import dumps
+import html
 
 app = Flask(__name__)
+#mongo_client = MongoClient('localhost')
 mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
 auth_collection = db['auth']
+post_collection = db['post']
 
-if count_collection.find_one({"establish": 1}) is None:
-    count_collection.insert_one({"id_count": 1})
-    count_collection.insert_one({"establish": 1})
+@app.route('/post-history', methods=['GET'])
+def getposts():
+    mylist = list(post_collection.find({}))
+    mylist.reverse()
+    return make_response(dumps(mylist))
 
+@app.route('/make-post', methods=['POST', 'GET'])
+def makepost():
+    if request.method == "POST":
+        if 'auth_token' in request.cookies:
+            auth_token = request.cookies.get('auth_token')
+            if auth_token is not None:
+                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+                check = auth_collection.find_one({"auth": hash_auth})
+                if check is not None:
+                    user = check['username']
+                    id = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
+                    title = html.escape(request.form.get('post-title'))
+                    message = html.escape(request.form.get('post-message'))
+                    post_collection.insert_one({"id": id, "username": user, "title": title, "message": message})
+    return redirect('/')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == "POST":
         user = request.form.get('username_reg')
+        user = html.escape(user)
         pwd = request.form.get('password_reg')
         salt = bcrypt.gensalt()
         pwd = bcrypt.hashpw(pwd.encode(), salt)
@@ -32,6 +54,7 @@ def login():
     if request.method == "POST":
         user = request.form.get('username_login')
         print(user)
+        user = html.escape(user)
         pwd = request.form.get('password_login')
         verify = auth_collection.find_one({'username': user})
         verify_pwd = verify['password']
@@ -59,6 +82,7 @@ def server():
     else:
         user = 'Guest'
     print(user)
+
     ser = make_response(render_template('index.html', username=user))
     ser.headers['X-Content-Type-Options'] = 'nosniff'
     ser.mimetype = 'text/html'
