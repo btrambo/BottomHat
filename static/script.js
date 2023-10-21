@@ -9,7 +9,7 @@
 //     request.send();
 // }
 
-
+let theInterval = 0;
 function chatMessageHTML(messageJSON) {
     const username = messageJSON.username;
     const title = messageJSON.title;
@@ -96,7 +96,7 @@ function sendChat() {
 }
 
 function clickFunction(idd) {
-    setInterval(updateChat, 4000);
+    clearInterval(theInterval);
     const request = new XMLHttpRequest();
 
         request.onreadystatechange = function () {
@@ -135,5 +135,5 @@ function welcome() {
     document.getElementById("exampleFormControlInput1").focus();
 
     updateChat();
-    setInterval(updateChat, 2000);
+    theInterval = setInterval(updateChat, 2000);
 }
