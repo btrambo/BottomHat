@@ -14,19 +14,51 @@ function chatMessageHTML(messageJSON) {
     const username = messageJSON.username;
     const title = messageJSON.title;
     const message = messageJSON.message;
-    let messageHTML = "<div class=\"card text-center\">" +
+    const likes = messageJSON.likes;
+    const postid = messageJSON.id;
+    // let messageHTML = "<div class=\"card text-center\">" +
+    //     "              <div class=\"card-header\">" +
+    //     "                " + username + "" +
+    //     "              </div>" +
+    //     "              <div class=\"card-body\">" +
+    //     "                <h5 class=\"card-title\">" + title + "</h5>" +
+    //     "                <p class=\"card-text\">" + message + "</p>" +
+    //     "                <i onclick=\"clickFunction(" + postid + ")\" class=\"fa fa-thumbs-up\"> " + likes + "</i>" +
+    //     "              </div>" +
+    //     "              <div class=\"card-footer text-body-secondary\">" + "&nbsp;" +
+    //     "              " +
+    //     "              </div>" +
+    //     "            </div><br>";
+
+        let messageHTML = "<div class=\"card text-center\">" +
         "              <div class=\"card-header\">" +
         "                " + username + "" +
         "              </div>" +
         "              <div class=\"card-body\">" +
         "                <h5 class=\"card-title\">" + title + "</h5>" +
         "                <p class=\"card-text\">" + message + "</p>" +
-        "                <i onclick=\"myFunction(this)\" class=\"fa fa-thumbs-up\"></i>" +
+        "<svg viewBox=\"0 0 130.000 130.000\" onclick=\"clickFunction(" + postid + ")\"    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n" +
+            "   xmlns:cc=\"http://creativecommons.org/ns#\"\n" +
+            "   xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" +
+            "   xmlns:svg=\"http://www.w3.org/2000/svg\"\n" +
+            "   xmlns=\"http://www.w3.org/2000/svg\"\n" +
+            "   version=\"1.1\"\n" +
+            "   width=\"40px\"\n" +
+            "   height=\"auto\"\n" +
+            "   id=\"svg2\">\n" +
+            "  <defs\n" +
+            "     id=\"defs8\" />\n" +
+            "  <path\n" +
+            "     d=\"M 65,29 C 59,19 49,12 37,12 20,12 7,25 7,42 7,75 25,80 65,118 105,80 123,75 123,42 123,25 110,12 93,12 81,12 71,19 65,29 z\"\n" +
+            "     id=\"path4\"\n" +
+            "     style=\"\" />\n" +
+            "</svg>" + "&nbsp;<span style=\"font-size: 20px; color: darkred;\">" + likes + "</span>" +
         "              </div>" +
         "              <div class=\"card-footer text-body-secondary\">" + "&nbsp;" +
         "              " +
         "              </div>" +
         "            </div><br>";
+
     return messageHTML;
 }
 
@@ -62,6 +94,19 @@ function sendChat() {
     request.send(JSON.stringify(messageJSON));
     title.focus();
     message.focus();
+}
+
+function clickFunction(idd) {
+    const request = new XMLHttpRequest();
+
+        request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+        }
+    }
+    request.open("POST", "/like");
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.send(JSON.stringify(idd));
 }
 
 function updateChat() {

@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template, make_response, request, send_from_directory, redirect
 from pymongo import MongoClient
 import bcrypt
@@ -21,6 +23,9 @@ def getposts():
     mylist.reverse()
     return make_response(dumps(mylist))
 
+
+
+
 @app.route('/make-post', methods=['POST', 'GET'])
 def makepost():
     if request.method == "POST":
@@ -34,7 +39,37 @@ def makepost():
                     id = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
                     title = html.escape(request.form.get('post-title'))
                     message = html.escape(request.form.get('post-message'))
-                    post_collection.insert_one({"id": id, "username": user, "title": title, "message": message})
+
+                    post_collection.insert_one({"id": id, "username": user, "title": title, "message": message, "likes": 0})
+    return redirect('/')
+
+@app.route('/like', methods=['POST', 'GET'])
+def makelike():
+    print(request)
+    if request.method == "POST":
+        if 'auth_token' in request.cookies:
+            auth_token = request.cookies.get('auth_token')
+            if auth_token is not None:
+                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+                check = auth_collection.find_one({"auth": hash_auth})
+                if check is not None:
+                    user = check['username']
+                    idd = request.json
+                    idd = json.dumps(idd)
+                    print(idd)
+
+
+                    try:
+
+                        if auth_collection.find_one({"username": user})[idd] == 1:
+                            auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 0}})
+                            post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": -1}})
+
+                    except:
+
+                        auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 1}})
+                        post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": 1}})
+
     return redirect('/')
 
 @app.route('/register', methods=['POST', 'GET'])

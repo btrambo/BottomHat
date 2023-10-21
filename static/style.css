@@ -1,3 +1,17 @@
 /*#post-wrap {*/
 /*    display: contents;*/
 /*}*/
+
+svg#svg2 {
+    cursor:pointer;
+}
+
+path#path4 {
+    fill: red;
+    stroke-width: 10px;
+    stroke: darkred;
+}
+
+/*path#path4:hover {*/
+/*    fill: red;*/
+/*}*/
