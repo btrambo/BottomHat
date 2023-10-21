@@ -65,6 +65,11 @@ def makelike():
                             auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 0}})
                             post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": -1}})
 
+                        else:
+
+                            auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 1}})
+                            post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": 1}})
+
                     except:
 
                         auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 1}})
