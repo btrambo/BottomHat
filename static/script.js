@@ -96,12 +96,12 @@ function sendChat() {
 }
 
 function clickFunction(idd) {
-    setInterval(updateChat, 20000);
+    setInterval(updateChat, 4000);
     const request = new XMLHttpRequest();
 
         request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            setInterval(updateChat, 2000);
+            welcome()
         }
     }
     request.open("POST", "/like");
