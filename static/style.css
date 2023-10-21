@@ -4,6 +4,8 @@
 
 svg#svg2 {
     cursor:pointer;
+    width: 40px;
+    height: auto;
 }
 
 path#path4 {

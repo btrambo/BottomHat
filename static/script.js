@@ -43,8 +43,7 @@ function chatMessageHTML(messageJSON) {
             "   xmlns:svg=\"http://www.w3.org/2000/svg\"\n" +
             "   xmlns=\"http://www.w3.org/2000/svg\"\n" +
             "   version=\"1.1\"\n" +
-            "   width=\"40px\"\n" +
-            "   height=\"auto\"\n" +
+
             "   id=\"svg2\">\n" +
             "  <defs\n" +
             "     id=\"defs8\" />\n" +
@@ -97,11 +96,12 @@ function sendChat() {
 }
 
 function clickFunction(idd) {
+    setInterval(updateChat, 20000);
     const request = new XMLHttpRequest();
 
         request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            console.log(this.response);
+            setInterval(updateChat, 2000);
         }
     }
     request.open("POST", "/like");
