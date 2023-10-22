@@ -97,15 +97,21 @@ def login():
         user = html.escape(user)
         pwd = request.form.get('password_login')
         verify = auth_collection.find_one({'username': user})
-        verify_pwd = verify['password']
-        ser = make_response(redirect('/'))
-        ser.mimetype = 'text/html'
-        if bcrypt.checkpw(pwd.encode(), verify_pwd):
-            token = secrets.token_urlsafe(10)
-            t = hashlib.sha256(token.encode()).hexdigest()
-            auth_collection.update_one({'username': user}, {'$set': {"auth": t}})
-            ser.set_cookie('auth_token', value=token, max_age=3600, httponly=True)
-        return ser
+        try:
+            verify_pwd = verify['password']
+            ser = make_response(redirect('/'))
+            ser.mimetype = 'text/html'
+            if bcrypt.checkpw(pwd.encode(), verify_pwd):
+                token = secrets.token_urlsafe(10)
+                t = hashlib.sha256(token.encode()).hexdigest()
+                auth_collection.update_one({'username': user}, {'$set': {"auth": t}})
+                ser.set_cookie('auth_token', value=token, max_age=3600, httponly=True)
+            return ser
+        except:
+            ser = make_response(redirect('/'))
+            ser.mimetype = 'text/html'
+            return ser
+
 
 
 @app.route('/')
