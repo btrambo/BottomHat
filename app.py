@@ -16,6 +16,7 @@ chat_collection = db['chat']
 count_collection = db['count']
 auth_collection = db['auth']
 post_collection = db['post']
+quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 
 @app.route('/post-history', methods=['GET'])
 def getposts():
