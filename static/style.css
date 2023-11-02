@@ -14,6 +14,66 @@ path#path4 {
     stroke: darkred;
 }
 
+/*landing page*/
+*{
+    color: white;
+}
+#webpage{
+    min-height: 100vh;
+    background-color: #121212;
+}
+
+#top-navbar{
+    background-color: #3f3f3f;
+    height: 70px;
+    align-items: center;
+}
+#content-section{
+    background-color: #121212;
+}
+#quiz-card{
+    background-color: #282828;
+    width: 50%;
+}
+.btn{
+    background-color: #3f3f3f !important;
+    color: white !important;
+}
+input{
+    background-color: #282828 !important; /* Change to your desired color */
+    color: white !important; /* Change the text color if needed */
+    border: 1px solid #000 !important; /* Change the border color and style if needed */
+}
+#right-topnavbar-column .dropdown-menu{
+    background-color: #121212;
+}
+.topnavbar-userinput input{
+    border: 1px solid #ccc; /* Define a border style and color */
+    border-radius:10px; /* Adjust the border radius as needed for the desired roundness */
+    padding: 2px; /* Add some padding for spacing inside the input */
+    margin: 5px;
+}
+.topnavbar-userinput input[type="submit"]{
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-bottom: 3%;
+}
+
+/*create post page*/
+#create-post-page{
+    background-color: #1a1e25;
+    min-height: 100vh;
+}
+.quiz-input-form {
+    margin-top: 70px;
+}
+select{
+    background-color: #282828 !important;
+    border: 1px solid #000 !important;
+}
+select:focus {
+  background-color: #282828;
+}
 /*path#path4:hover {*/
 /*    fill: red;*/
 /*}*/
