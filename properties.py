@@ -1,5 +1,7 @@
-from app import quiz_collection 
-
+from pymongo import MongoClient
+mongo_client = MongoClient('mongo')
+db = mongo_client['cse312']
+quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:
     def __init__(self, title, username, options, correct):
         self.title = title
@@ -19,7 +21,7 @@ def convert_mongo_to_quizInput():
         usernames = document['username']
         titles = document['title']
         questions = document['options'] #options is going to have 3 values, should be able to set as a key:value with value as an arr
-        answers = document['answers'] #going to have 1 2 or 3
+        answers = document['answer'] #going to have 1 2 or 3
 
         document = quizInput(usernames,titles,questions,answers)
 

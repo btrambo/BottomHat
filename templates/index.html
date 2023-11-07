@@ -1,31 +1,31 @@
 <html>
 <head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/style.css">
 
 
-	<title>CSE312 Homework App</title>
+    <title>CSE312 Homework App</title>
 
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3&display=swap" rel="stylesheet">
 
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-	      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-	<!-- 	import popper for dropdown menu -->
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-	        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-	        crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-	        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-	        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <!-- 	import popper for dropdown menu -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"></script>
 
-	<script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
-	<script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
 
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
 </head>
@@ -34,159 +34,161 @@
 
 <div class="container-fluid" id="webpage">
 
-	<!---TOP NAVBAR--->
-	<div class="row" id="top-navbar">
-		<div class="col-2">
-			<!---Left Container--->
-		</div>
-		<div class="col-8 text-center">
-			<!---middle Container--->
+    <!---TOP NAVBAR--->
+    <div class="row" id="top-navbar">
+        <div class="col-2">
+            <!---Left Container--->
+        </div>
+        <div class="col-8 text-center">
+            <!---middle Container--->
 
 
-			<div class="container ">
-				<div class="row align-items-center">
+            <div class="container ">
+                <div class="row align-items-center">
 
-					<!---middle left side--->
-					<div class="col-6 text-start" id="left-topnavbar-column">
-						<h1>CSE 312 Bottom Hat</h1>
-					</div>
-					<!---middle right side--->
-					<div class="col-6 text-end" id="right-topnavbar-column">
-						<div class="row">
-							<div class="col-4">
-								<a class="btn " href="create-quiz.html" role="button">Submit Question</a>
-							</div>
-							<div class="col-3">
+                    <!---middle left side--->
+                    <div class="col-6 text-start" id="left-topnavbar-column">
+                        <h1>CSE 312 Bottom Hat</h1>
+                    </div>
+                    <!---middle right side--->
+                    <div class="col-6 text-end" id="right-topnavbar-column">
+                        <div class="row">
+                            <div class="col-4">
+                                <a class="btn " href="{{ url_for('question_form_page') }}" role="button">Submit
+                                    Question</a>
+                            </div>
+                            <div class="col-3">
 
-								<div class="dropdown" id="login-dropdown">
-									<button class="btn dropdown-toggle" type="button"
-									        data-bs-toggle="dropdown" aria-expanded="false">
-										Login
-									</button>
-									<ul class="dropdown-menu topnavbar-userinput" id="log-drop">
-										<form action="/login" method="post" enctype="application/x-www-form-urlencoded">
-											<label>Username:
-												<input id="login-form-username" type="text" name="username_login"/>
-											</label>
-											<br/>
-											<label>Password:&nbsp;
-												<input id="login-form-pass" type="password" name="password_login">
-											</label>
-											<input type="submit" value="Post">
-										</form>
-									</ul>
-								</div>
-							</div>
-							<div class="col-3">
-								<div class="dropdown" id="register-dropdown">
-									<button class="btn dropdown-toggle " type="button"
-									        data-bs-toggle="dropdown" aria-expanded="false">
-										Register
-									</button>
-									<ul class="dropdown-menu topnavbar-userinput">
-										<form action="/register" method="post"
-										      enctype="application/x-www-form-urlencoded">
+                                <div class="dropdown" id="login-dropdown">
+                                    <button class="btn dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        Login
+                                    </button>
+                                    <ul class="dropdown-menu topnavbar-userinput" id="log-drop">
+                                        <form action="/login" method="post" enctype="application/x-www-form-urlencoded">
+                                            <label>Username:
+                                                <input id="login-form-username" type="text" name="username_login"/>
+                                            </label>
+                                            <br/>
+                                            <label>Password:&nbsp;
+                                                <input id="login-form-pass" type="password" name="password_login">
+                                            </label>
+                                            <input type="submit" value="Post">
+                                        </form>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="dropdown" id="register-dropdown">
+                                    <button class="btn dropdown-toggle " type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        Register
+                                    </button>
+                                    <ul class="dropdown-menu topnavbar-userinput">
+                                        <form action="/register" method="post"
+                                              enctype="application/x-www-form-urlencoded">
 
-											<label class="form-label">Username:
-												<input class="form-control" id="reg-form-username" type="text"
-												       name="username_reg"/>
-											</label>
+                                            <label class="form-label">Username:
+                                                <input class="form-control" id="reg-form-username" type="text"
+                                                       name="username_reg"/>
+                                            </label>
 
-											<br/>
+                                            <br/>
 
-											<label>Password:&nbsp;
-												<input class="form-control" id="reg-form-pass" type="password"
-												       name="password_reg">
-											</label>
+                                            <label>Password:&nbsp;
+                                                <input class="form-control" id="reg-form-pass" type="password"
+                                                       name="password_reg">
+                                            </label>
 
-											<input type="submit" value="Post">
-										</form>
-									</ul>
-								</div>
-							</div>
-						</div>
-
-
-					</div>
-				</div>
-			</div>
+                                            <input type="submit" value="Post">
+                                        </form>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
 
 
-		</div>
+                    </div>
+                </div>
+            </div>
 
 
-		<div class="col-2 text-end">
-			<!---right Container--->
-			<h5>{{ username }}</h5>
-		</div>
-	</div>
+        </div>
 
-	<!---MIDDLE ROW WHERE CONTENT IS--->
-	<div class="row" id="content-section">
 
-		<!---Left Container--->
-		<div class="col-2">
+        <div class="col-2 text-end">
+            <!---right Container--->
+            <h5>{{ username }}</h5>
+        </div>
+    </div>
 
-		</div>
+    <!---MIDDLE ROW WHERE CONTENT IS--->
+    <div class="row" id="content-section">
 
-		<!---middle Container--->
-		<div class="col-8 text-center" id="post-feed">
-			<h2>FEED</h2>
-			<!-- <div id="post-wrap"></div>  -->
+        <!---Left Container--->
+        <div class="col-2">
 
-			<!--  iterate though a list of type quiz_inputs -->
-			{% for input in question_list %}
-			<div id="quiz-feed">
-				<div class="card" id="quiz-card">
-					<div class="card-body">
-						<h5 class="card-title">{{ input[loop.index0].title }}</h5>
-						<h6 class="card-subtitle mb-2 ">{{ input[loop.index0].username }}</h6>
-						<p class="card-text" id="multiple-choice-text">
-						<div class="row">
-							<div class="col">
-								<form action="/submit-quiz-answer" method="post"
-								      enctype="application/x-www-form-urlencoded">
-									<div class="form-check">
-										<input class="form-check-input" type="radio"
-										       id="multiple-choice-1"
-										       value="option1">
-										<label class="form-check-label" for="multiple-choice-1">
-											{{ input[loop.index0].option[0] }}
-										</label>
-									</div>
-									<div class="form-check">
-										<input class="form-check-input" type="radio"
-										       id="multiple-choice-2"
-										       value="option2">
-										<label class="form-check-label" for="multiple-choice-2">
-											{{ input[loop.index0].option[1] }}
-										</label>
-									</div>
-									<div class="form-check">
-										<input class="form-check-input" type="radio"
-										       id="multiple-choice-3"
-										       value="option3">
-										<label class="form-check-label" for="multiple-choice-3">
-											{{ input[loop.index0].option[2] }}
-										</label>
-									</div>
-									<input class="btn" type="submit" value="Submit">
-								</form>
-							</div>
-							<div class="col" id="user-image">
-								<p>Add uploaded image somewhere in this div</p>
-							</div>
-						</div>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
+        </div>
 
-		<div class="col-2">
-			<!---right Container--->
-		</div>
-	</div>
+        <!---middle Container--->
+        <div class="col-8 text-center" id="post-feed">
+            <h2>FEED</h2>
+            <div id="post-wrap"></div>
+
+            <!--  iterate though a list of type quiz_inputs -->
+            {% for input in question_list %}
+            <div id="quiz-feed">
+                <div class="card" id="quiz-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ input.title }}</h5>
+                        <h6 class="card-subtitle mb-2 ">{{ input.username }}</h6>
+                        <p class="card-text" id="multiple-choice-text">
+                        <div class="row">
+                            <div class="col">
+                                <form action="/submit-quiz-answer" method="post"
+                                      enctype="application/x-www-form-urlencoded">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="multiple-choice-1"
+                                               value="option1">
+                                        <label class="form-check-label" for="multiple-choice-1">
+                                            {{ input.options[0] }}
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="multiple-choice-2"
+                                               value="option2">
+                                        <label class="form-check-label" for="multiple-choice-2">
+                                            {{ input.options[1] }}
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="multiple-choice-3"
+                                               value="option3">
+                                        <label class="form-check-label" for="multiple-choice-3">
+                                            {{ input.options[2] }}
+                                        </label>
+                                    </div>
+                                    <input class="btn" type="submit" value="Submit">
+                                </form>
+                            </div>
+                            <div class="col" id="user-image">
+                                <p>Add uploaded image somewhere in this div</p>
+                            </div>
+                        </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-2">
+            <!---right Container--->
+        </div>
+    </div>
 </div>
 <script src="/static/script.js"></script>
 

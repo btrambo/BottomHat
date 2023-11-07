@@ -70,10 +70,12 @@ input{
 select{
     background-color: #282828 !important;
     border: 1px solid #000 !important;
+    color: white;
 }
 select:focus {
   background-color: #282828;
 }
+
 /*path#path4:hover {*/
 /*    fill: red;*/
 /*}*/

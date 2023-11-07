@@ -1,5 +1,4 @@
 import json
-
 from flask import Flask, render_template, make_response, request, send_from_directory, redirect
 from pymongo import MongoClient
 import bcrypt
@@ -7,9 +6,9 @@ import secrets
 import hashlib
 from bson.json_util import dumps
 import html
+from properties import convert_mongo_to_quizInput, quizInput
 
 app = Flask(__name__)
-#mongo_client = MongoClient('localhost')
 mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 chat_collection = db['chat']
@@ -18,13 +17,71 @@ auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 
+
+@app.route('/')
+def server():
+    if 'auth_token' in request.cookies:
+        auth_token = request.cookies.get('auth_token')
+        if auth_token is not None:
+            hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+            check = auth_collection.find_one({"auth": hash_auth})
+            if check is not None:
+                user = check['username']
+            else:
+                user = 'Guest'
+    else:
+        user = 'Guest'
+
+    quiz_list = convert_mongo_to_quizInput()
+    print(quiz_list)
+    response = make_response(render_template('index.html', username=user,question_list=quiz_list))
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.mimetype = 'text/html'
+    response.status_code = 200
+    return response
+
+
+@app.route('/question_form_page', methods=['GET'])
+def question_form_page():
+    response = make_response(render_template('create-quiz.html'))
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.mimetype = 'text/html'
+    response.status_code = 200
+    return response
+
+
+@app.route('/submit-quiz-question', methods=['POST', 'GET'])
+def submit_quiz_question():
+    if request.method == "POST":
+        if 'auth_token' in request.cookies:
+            auth_token = request.cookies.get('auth_token')
+            if auth_token is not None:
+                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+                check = auth_collection.find_one({"auth": hash_auth})
+                if check is not None:
+                    user = check['username']
+                    # id = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
+
+                    title = html.escape(request.form.get('question-title'))
+                    option1 = html.escape(request.form.get('option1'))
+                    option2 = html.escape(request.form.get('option2'))
+                    option3 = html.escape(request.form.get('option3'))
+                    minutes = html.escape(request.form.get('minutes-input'))
+                    seconds = html.escape(request.form.get('seconds-input'))
+                    all_options = [option1, option2, option3]
+
+                    quiz_collection.insert_one(
+                        {"username": user, "title": title, "options": all_options, "minutes": minutes,"seconds": seconds, "answer":"option1"})
+    return redirect('/')
+@app.route('/submit-quiz-response', methods=['GET'])
+def submit_quiz_response():
+    print("idk")
+
 @app.route('/post-history', methods=['GET'])
 def getposts():
     mylist = list(post_collection.find({}))
     mylist.reverse()
     return make_response(dumps(mylist))
-
-
 
 
 @app.route('/make-post', methods=['POST', 'GET'])
@@ -112,30 +169,6 @@ def login():
             ser = make_response(redirect('/'))
             ser.mimetype = 'text/html'
             return ser
-
-
-
-@app.route('/')
-def server():
-    if 'auth_token' in request.cookies:
-        auth_token = request.cookies.get('auth_token')
-        if auth_token is not None:
-            hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
-            check = auth_collection.find_one({"auth": hash_auth})
-            if check is not None:
-                user = check['username']
-            else:
-                user = 'Guest'
-    else:
-        user = 'Guest'
-    print(user)
-
-    ser = make_response(render_template('index.html', username=user))
-    ser.headers['X-Content-Type-Options'] = 'nosniff'
-    ser.mimetype = 'text/html'
-    ser.status_code = 200
-    return ser
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

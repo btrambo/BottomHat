@@ -24,14 +24,14 @@
 	<div class="col-6">
 		<!---Left Container--->
 		<div class="quiz-input-form">
-			<form class="row g-3" method="post" action="/submit-quiz" enctype="application/x-www-form-urlencoded">
+			<form class="row g-3" method="post" action="/submit-quiz-question" enctype="application/x-www-form-urlencoded">
 				<div class="col-md-6">
 					<label for="question_title" class="form-label">Question Title</label>
-					<input type="text" class="form-control" id="question_title">
+					<input type="text" class="form-control" name="question-title" id="question_title">
 				</div>
 				<div class="col-md-6">
 					<label for="inputState" class="form-label">Which Option is correct</label>
-					<select id="inputState" class="form-select">
+					<select id="inputState" name="answer" class="form-select">
 						<option>1</option>
 						<option>2</option>
 						<option>3</option>
@@ -39,23 +39,23 @@
 				</div>
 				<div class="col-12">
 					<label for="option1" class="form-label">Option1</label>
-					<input type="text" class="form-control" id="option1">
+					<input type="text" class="form-control" name="option1" id="option1">
 				</div>
 				<div class="col-12">
 					<label for="option2" class="form-label">Option2</label>
-					<input type="text" class="form-control" id="option2">
+					<input type="text" class="form-control" name="option2" id="option2">
 				</div>
 				<div class="col-md-12">
 					<label for="option3" class="form-label">Option3</label>
-					<input type="text" class="form-control" id="option3">
+					<input type="text" class="form-control" name="option3" id="option3">
 				</div>
 				<div class="col-md-6">
 					<label for="minutes-input" class="form-label">Time(minutes)</label>
-					<input type="text" class="form-control" id="minutes-input">
+					<input type="text" class="form-control" name="minutes-input" id="minutes-input">
 				</div>
 				<div class="col-md-6">
 					<label for="seconds-input" class="form-label">Time(seconds)</label>
-					<input type="text" class="form-control" id="seconds-input">
+					<input type="text" class="form-control" name="seconds-input" id="seconds-input">
 				</div>
 				<div class="col-12">
 					<button type="submit" class="btn">Submit</button>
