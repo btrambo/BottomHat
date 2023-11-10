@@ -31,8 +31,8 @@ path#path4 {
 #content-section{
     background-color: #121212;
 }
-#quiz-card{
-    background-color: #282828;
+.card{
+    background-color: #282828 !important;
     width: 50%;
 }
 .btn{
@@ -75,6 +75,83 @@ select{
 select:focus {
   background-color: #282828;
 }
+
+#quiz-feed {
+
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px
+}
+
+.congrats {
+
+    color: mediumspringgreen;
+    font-size: x-large;
+    font-weight: 600;
+}
+
+.fail {
+
+    color: orangered;
+    font-size: x-large;
+    font-weight: 600;
+}
+
+#lose {
+    display: none;
+
+}
+
+#qfoot {
+    display: flex;
+    justify-content: right;
+}
+
+.footcardtext, .footcardtext2 {
+
+    justify-content: center;
+    font-size: .8em;
+    color: black;
+    margin: 2%;
+    font-weight: 600;
+
+}
+.footcardtext2 {
+    display: none;
+}
+
+.footcardtext:hover, .footcardtext2:hover {
+
+   text-decoration: underline;
+    cursor: pointer;
+
+}
+
+#gfoot {
+
+
+    justify-content: right;
+}
+
+#footcard {
+
+    display: flex;
+    background-color: gold;
+    width: 70%;
+    border-top-left-radius: .375em;
+    border-bottom-right-radius: .375em;
+    justify-content: center;
+}
+
+.card-grades {
+
+    display: none;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
 
 /*path#path4:hover {*/
 /*    fill: red;*/

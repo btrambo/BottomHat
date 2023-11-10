@@ -53,7 +53,7 @@
                     <!---middle right side--->
                     <div class="col-6 text-end" id="right-topnavbar-column">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-4" style="display: {{ hider }} !important">
                                 <a class="btn " href="{{ url_for('question_form_page') }}" role="button">Submit
                                     Question</a>
                             </div>
@@ -138,7 +138,7 @@
             <!--  iterate though a list of type quiz_inputs -->
             {% for input in question_list %}
             <div id="quiz-feed">
-                <div class="card" id="quiz-card">
+                <div class="card" id="q{{ input.id }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ input.title }}</h5>
                         <h6 class="card-subtitle mb-2 ">{{ input.username }}</h6>
@@ -181,10 +181,32 @@
                                 <p>Add uploaded image somewhere in this div</p>
                             </div>
                         </div>
+
+
                         </p>
+                        <div><div id="win"><p class="congrats">CONGRATULATIONS!</p>
+                            <p>You received 1 point for this question.</p></div>
+                            <div id="lose"><p class="fail">TRY HARDER!</p>
+                            <p>You received 0 points for this question.</p></div>
+                        </div>
+
                     </div>
+                    <div class="card-grades">
+                         <div class="row">
+                            <div class="col" style="color:burlywood !important; font-size: x-large !important;">
+                                User:
+                                </div>
+                              <div class="col" style="color:burlywood !important; font-size: x-large !important;">
+                                  GRADE
+                                </div>
+                                </div>
+
+
+                    </div>
+                    <div id="qfoot" style="display:{{ input.show }}"><div id="footcard" onclick="seeGrades(this)"><p class="footcardtext">See your question's submissions.</p><p class="footcardtext2">Go back to the question.</p></div></div>
                 </div>
             </div>
+
             {% endfor %}
         </div>
 

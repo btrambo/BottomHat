@@ -124,6 +124,32 @@ function updateChat() {
     request.send();
 }
 
+function seeGrades(currentelement) {
+
+    const qcard = currentelement.closest(".card");
+    const qcontent = currentelement.closest(".card").firstChild.nextElementSibling;
+    const gcontent = qcontent.nextElementSibling;
+    const qtext = currentelement.firstChild;
+    const gtext = qtext.nextSibling;
+
+
+    if (qcontent.style.display != "none") {
+        qcontent.style.display = "none";
+        qtext.style.display = "none";
+        gtext.style.cssText = "display:block !important";
+        gcontent.style.display = "flex";
+        qcard.style.cssText = "background-color:darkred !important";
+
+    }
+    else {
+        qcontent.style.display = "block";
+        gcontent.style.display = "none";
+        qtext.style.display = "block";
+        gtext.style.cssText = "display:none !important";
+        qcard.style.background = "#282828";}
+
+}
+
 function welcome() {
     document.addEventListener("keypress", function (event) {
         if (event.code === "Enter") {

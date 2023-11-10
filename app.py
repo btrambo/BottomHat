@@ -9,7 +9,7 @@ import html
 from properties import convert_mongo_to_quizInput, quizInput
 
 app = Flask(__name__)
-mongo_client = MongoClient('mongo')
+mongo_client = MongoClient('localhost')
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
@@ -17,6 +17,23 @@ auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 
+# def getuser():
+#     if 'auth_token' in request.cookies:
+#         auth_token = request.cookies.get('auth_token')
+#         if auth_token is not None:
+#             hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+#             check = auth_collection.find_one({"auth": hash_auth})
+#             if check is not None:
+#                 user = check['username']
+#                 return user
+#             else:
+#                 user = 'Guest'
+#                 hideheader = "none"
+#                 return None
+#     else:
+#         user = 'Guest'
+#         hideheader = "none"
+#         return None
 
 @app.route('/')
 def server():
@@ -27,14 +44,20 @@ def server():
             check = auth_collection.find_one({"auth": hash_auth})
             if check is not None:
                 user = check['username']
+                hideheader = "block"
+                currentuser = user
             else:
                 user = 'Guest'
+                hideheader = "none"
+                currentuser = None
     else:
         user = 'Guest'
+        hideheader = "none"
+        currentuser = None
 
-    quiz_list = convert_mongo_to_quizInput()
+    quiz_list = convert_mongo_to_quizInput(currentuser)
     print(quiz_list)
-    response = make_response(render_template('index.html', username=user,question_list=quiz_list))
+    response = make_response(render_template('index.html', hider=hideheader, username=user, question_list=quiz_list))
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.mimetype = 'text/html'
     response.status_code = 200
@@ -60,7 +83,7 @@ def submit_quiz_question():
                 check = auth_collection.find_one({"auth": hash_auth})
                 if check is not None:
                     user = check['username']
-                    # id = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
+                    ide = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
 
                     title = html.escape(request.form.get('question-title'))
                     option1 = html.escape(request.form.get('option1'))
@@ -71,7 +94,7 @@ def submit_quiz_question():
                     all_options = [option1, option2, option3]
 
                     quiz_collection.insert_one(
-                        {"username": user, "title": title, "options": all_options, "minutes": minutes,"seconds": seconds, "answer":"option1"})
+                        {"id": ide, "username": user, "title": title, "options": all_options, "minutes": minutes,"seconds": seconds, "answer":"option1"})
     return redirect('/')
 @app.route('/submit-quiz-response', methods=['GET'])
 def submit_quiz_response():
@@ -140,6 +163,10 @@ def register():
     if request.method == "POST":
         user = request.form.get('username_reg')
         user = html.escape(user)
+        if user == "":
+            user = "MAN WITH NO NAME"
+        if user == "Guest":
+            user = "I'M A LOSER"
         pwd = request.form.get('password_reg')
         salt = bcrypt.gensalt()
         pwd = bcrypt.hashpw(pwd.encode(), salt)
