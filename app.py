@@ -9,7 +9,7 @@ import html
 from properties import convert_mongo_to_quizInput, quizInput
 
 app = Flask(__name__)
-mongo_client = MongoClient('localhost')
+mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
