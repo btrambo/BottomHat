@@ -151,6 +151,13 @@ select:focus {
     margin-bottom: 10px;
 }
 
+#yourq p {
+
+    font-size: smaller;
+    color: orange;
+    font-style: italic;
+}
+
 
 
 /*path#path4:hover {*/

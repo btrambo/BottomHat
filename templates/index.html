@@ -143,7 +143,7 @@
                         <h5 class="card-title">{{ input.title }}</h5>
                         <h6 class="card-subtitle mb-2 ">{{ input.username }}</h6>
                         <p class="card-text" id="multiple-choice-text">
-                        <div class="row">
+                        <div class="row" >
                             <div class="col">
                                 <form action="/submit-quiz-answer" method="post"
                                       enctype="application/x-www-form-urlencoded">
@@ -174,7 +174,8 @@
                                             {{ input.options[2] }}
                                         </label>
                                     </div>
-                                    <input class="btn" type="submit" value="Submit">
+                                    <input style="display:{{ input.show2 }}" class="btn" type="submit" value="Submit">
+
                                 </form>
                             </div>
                             <div class="col" id="user-image">
@@ -184,11 +185,14 @@
 
 
                         </p>
-                        <div><div id="win"><p class="congrats">CONGRATULATIONS!</p>
+                        <div style="display:{{ input.show2 }}"><div id="win"><p class="congrats">CONGRATULATIONS!</p>
                             <p>You received 1 point for this question.</p></div>
                             <div id="lose"><p class="fail">TRY HARDER!</p>
                             <p>You received 0 points for this question.</p></div>
+
+
                         </div>
+                <div id="yourq" style="display:{{ input.show3 }}"> <p>(This is your question. You cannot answer it.)</p></div>
 
                     </div>
                     <div class="card-grades">

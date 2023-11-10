@@ -3,13 +3,15 @@ mongo_client = MongoClient('localhost')
 db = mongo_client['cse312']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:
-    def __init__(self, title, username, options, correct, ide, showbutton):
+    def __init__(self, title, username, options, correct, ide, showbutton, showbutton2, showbutton3):
         self.title = title
         self.username = username
         self.options = options
         self.correct_response = correct # string either option 1, option2, or option 3
         self.id = ide
         self.show = showbutton
+        self.show2 = showbutton2
+        self.show3 = showbutton3
         # add id to div id
 
 def convert_mongo_to_quizInput(currentuser):
@@ -28,9 +30,13 @@ def convert_mongo_to_quizInput(currentuser):
         answers = document['answer'] #going to have 1 2 or 3
         ide = document["id"]
         showbutton = "none"
+        showbutton2 = "inline-block"
+        showbutton3 = "none"
         if currentuser == usernames:
             showbutton = "flex"
-        document = quizInput(usernames,titles,questions,answers,ide,showbutton)
+            showbutton2 = "none"
+            showbutton3 = "block"
+        document = quizInput(usernames,titles,questions,answers,ide,showbutton,showbutton2, showbutton3)
 
         arr.append(document)
 
