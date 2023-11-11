@@ -3,7 +3,7 @@ mongo_client = MongoClient('localhost')
 db = mongo_client['cse312']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:
-    def __init__(self, title, username, options, correct, ide, showbutton, showbutton2, showbutton3):
+    def __init__(self, title, username, options, correct, ide, showbutton, showbutton2, showbutton3, showimage, image):
         self.title = title
         self.username = username
         self.options = options
@@ -12,6 +12,9 @@ class quizInput:
         self.show = showbutton
         self.show2 = showbutton2
         self.show3 = showbutton3
+        self.showimage = showimage
+        self.image = image
+
         # add id to div id
 
 def convert_mongo_to_quizInput(currentuser):
@@ -36,7 +39,13 @@ def convert_mongo_to_quizInput(currentuser):
             showbutton = "flex"
             showbutton2 = "none"
             showbutton3 = "block"
-        document = quizInput(usernames,titles,questions,answers,ide,showbutton,showbutton2, showbutton3)
+        try:
+            image = document["image"]
+            showimage = "flex"
+        except:
+            image = "none"
+            showimage = "none"
+        document = quizInput(usernames,titles,questions,answers,ide,showbutton,showbutton2, showbutton3, showimage, image)
 
         arr.append(document)
 

@@ -16,6 +16,7 @@ count_collection = db['count']
 auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
+app.config['UPLOAD_FOLDER'] = 'static/images'
 
 # def getuser():
 #     if 'auth_token' in request.cookies:
@@ -74,6 +75,7 @@ def question_form_page():
 
 
 @app.route('/submit-quiz-question', methods=['POST', 'GET'])
+
 def submit_quiz_question():
     if request.method == "POST":
         if 'auth_token' in request.cookies:
@@ -93,8 +95,18 @@ def submit_quiz_question():
                     seconds = html.escape(request.form.get('seconds-input'))
                     all_options = [option1, option2, option3]
 
-                    quiz_collection.insert_one(
-                        {"id": ide, "username": user, "title": title, "options": all_options, "minutes": minutes,"seconds": seconds, "answer":"option1"})
+                    if "image-input" in request.files:
+                        myfile = request.files['image-input']
+                        path = "static/images/" + "quizimage" + str(ide) + ".jpg"
+                        myfile.save(path)
+                        quiz_collection.insert_one(
+                            {"id": ide, "image": path, "username": user, "title": title, "options": all_options, "minutes": minutes,
+                             "seconds": seconds, "answer": "option1"})
+                    else:
+                        quiz_collection.insert_one(
+                            {"id": ide, "username": user, "title": title, "options": all_options, "minutes": minutes,
+                             "seconds": seconds, "answer": "option1"})
+
     return redirect('/')
 @app.route('/submit-quiz-response', methods=['GET'])
 def submit_quiz_response():
@@ -104,7 +116,14 @@ def submit_quiz_response():
 def getposts():
     mylist = list(post_collection.find({}))
     mylist.reverse()
+    print("test1")
     return make_response(dumps(mylist))
+
+@app.route('/static/images', methods=['GET'])
+def double_secure_image():
+    print(request.path)
+    print("test2")
+    return
 
 
 @app.route('/make-post', methods=['POST', 'GET'])

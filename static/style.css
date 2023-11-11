@@ -158,6 +158,11 @@ select:focus {
     font-style: italic;
 }
 
+.my_image {
+
+    width: 100%;
+}
+
 
 
 /*path#path4:hover {*/
