@@ -9,7 +9,7 @@ import html
 from properties import convert_mongo_to_quizInput, quizInput
 
 app = Flask(__name__)
-mongo_client = MongoClient('mongo')
+mongo_client = MongoClient('localhost')
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
@@ -50,6 +50,11 @@ def question_form_page():
     return response
 
 
+@app.route('/images/<filename>')
+def serve_image(filename):
+    return send_from_directory('static/quiz-images', filename)
+
+
 @app.route('/submit-quiz-question', methods=['POST', 'GET'])
 def submit_quiz_question():
     if request.method == "POST":
@@ -70,9 +75,18 @@ def submit_quiz_question():
                     seconds = html.escape(request.form.get('seconds-input'))
                     all_options = [option1, option2, option3]
 
+                    uploaded_file = request.files['question-image']
+                    if uploaded_file:
+                        file_contents = uploaded_file.read()
+                        user_filename = uploaded_file.filename.replace("/", "")
+                        with open("quiz-images/" + user_filename, 'wb') as file:
+                            file.write(file_contents)
+
                     quiz_collection.insert_one(
-                        {"username": user, "title": title, "options": all_options, "minutes": minutes,"seconds": seconds, "answer":"option1"})
+                        {"username": user, "title": title, "options": all_options, "minutes": minutes, "seconds": seconds, "answer":"option1", "filename": user_filename}
+                    )
     return redirect('/')
+
 @app.route('/submit-quiz-response', methods=['GET'])
 def submit_quiz_response():
     print("idk")
@@ -115,7 +129,6 @@ def makelike():
                     idd = request.json
                     idd = json.dumps(idd)
                     print(idd)
-
 
                     try:
 
