@@ -8,11 +8,15 @@ from bson.json_util import dumps
 import html
 from properties import convert_mongo_to_quizInput, quizInput
 from flask_socketio import SocketIO, send, emit
+import os
+from werkzeug.utils import secure_filename
+
+
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'verysecretencrypt!'
-app.config['UPLOAD_FOLDER'] = 'static/images'
+app.config['UPLOAD_PATH'] = 'static/images/'
 socket = SocketIO(app)
 mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
@@ -197,7 +201,15 @@ def submit_quiz_question():
                     c = "quiz_" + str(c)
                     if "image-input" in request.files:
                         myfile = request.files['image-input']
-                        path = "static/images/" + "quizimage" + str(ide) + ".jpg"
+
+
+
+                        fname = "quizimage" + str(ide) + ".jpg"
+
+                        basedir = os.path.abspath(os.path.dirname(__file__))
+
+                        myfile.save(os.path.join(app.config['UPLOAD_PATH'], fname))
+                        path = "static/images/" + fname
                         # myfile.save(path)
                         quiz_collection.insert_one(
                             {"id": ide, "image": path, "username": user, "title": title, "options": all_options, "time": time, "seconds": seconds, "quiz_id": c, "answer":"option1"})
