@@ -1,13 +1,16 @@
 from pymongo import MongoClient
-mongo_client = MongoClient('localhost')
+mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:
-    def __init__(self, title, username, options, correct, ide, showbutton, showbutton2, showbutton3, showimage, image):
+    def __init__(self, title, username, options, correct, seconds, time, quiz_id, ide, showbutton, showbutton2, showbutton3, showimage, image):
         self.title = title
         self.username = username
         self.options = options
         self.correct_response = correct # string either option 1, option2, or option 3
+        self.seconds = seconds
+        self.time = time
+        self.quiz_id = quiz_id
         self.id = ide
         self.show = showbutton
         self.show2 = showbutton2
@@ -32,6 +35,9 @@ def convert_mongo_to_quizInput(currentuser):
         questions = document['options'] #options is going to have 3 values, should be able to set as a key:value with value as an arr
         answers = document['answer'] #going to have 1 2 or 3
         ide = document["id"]
+        seconds = document['seconds']
+        time = document['time']
+        quiz_id = document['quiz_id']
         showbutton = "none"
         showbutton2 = "inline-block"
         showbutton3 = "none"
@@ -45,7 +51,7 @@ def convert_mongo_to_quizInput(currentuser):
         except:
             image = "none"
             showimage = "none"
-        document = quizInput(usernames,titles,questions,answers,ide,showbutton,showbutton2, showbutton3, showimage, image)
+        document = quizInput(usernames,titles,questions,answers,seconds, time, quiz_id,ide,showbutton,showbutton2, showbutton3, showimage, image)
 
         arr.append(document)
 

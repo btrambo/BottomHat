@@ -7,16 +7,105 @@ import hashlib
 from bson.json_util import dumps
 import html
 from properties import convert_mongo_to_quizInput, quizInput
+from flask_socketio import SocketIO, send, emit
+
 
 app = Flask(__name__)
-mongo_client = MongoClient('localhost')
+app.config['SECRET_KEY'] = 'verysecretencrypt!'
+app.config['UPLOAD_FOLDER'] = 'static/images'
+socket = SocketIO(app)
+mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
 auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
-app.config['UPLOAD_FOLDER'] = 'static/images'
+qcount_collection = db['qcount']
+clients = []
+
+if count_collection.find_one({"establish": 1}) is None:
+    count_collection.insert_one({"id_count": 1})
+    qcount_collection.insert_one({"count": 0})
+    count_collection.insert_one({"establish": 1})
+
+@socket.on('connect')
+def handle_connect():
+   c = request.sid
+   clients.append(c)
+
+
+@socket.on('disconnect')
+def handle_disconnect():
+   c = request.sid
+   clients.remove(c)
+
+
+@socket.on('submit')
+def handle_submit(answer):
+    result = json.loads(answer)
+    result = result.split(',')
+    emit('test', result)
+    if 'auth_token' in request.cookies:
+        auth_token = request.cookies.get('auth_token')
+        if auth_token is not None:
+            hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+            check = auth_collection.find_one({"auth": hash_auth})
+            if check is not None:
+                user = check['username']
+                emit('test', user)
+                questions = check['quiz_list']
+            quiz = quiz_collection.find_one({"quiz_id": result[0]})
+            if quiz is not None:
+                same_user = quiz['username']
+                if result[0] not in questions and user != same_user:
+                    questions.append([result[0],result[1]])
+                    auth_collection.update_one({'username':user}, {'$set': {"questions": questions}})
+                    auth_collection.update_one({'username':user}, {'$set': {"quiz_list": result[0]}})
+
+
+@socket.on('reload')
+def handle_reload():
+   timer = []
+   count = 0
+   currentuser = None
+   if qcount_collection.find_one({"establish": 1}) is not None and request.sid == clients[0]:
+        if 'auth_token' in request.cookies:
+            auth_token = request.cookies.get('auth_token')
+            if auth_token is not None:
+                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+                check = auth_collection.find_one({"auth": hash_auth})
+                if check is not None:
+                    currentuser = check['username']
+        quiz = convert_mongo_to_quizInput(currentuser)
+        for i in quiz:
+           quiz_id = i.quiz_id
+           question = quiz_collection.find_one({"quiz_id": quiz_id})
+           sec = int(question['seconds'])
+           time = question['time']
+           if sec != 0:
+               sec -= 1
+               minutes = int(sec/60)
+               seconds = sec % 60
+               if seconds < 10:
+                   time = str(minutes) + ':0' + str(seconds)
+               else:
+                   time = str(minutes) + ':' + str(seconds)
+               quiz_collection.update_one({'quiz_id': quiz_id}, {'$set': {"time": time}})
+               timer.append([quiz_id, time])
+               quiz_collection.update_one({'quiz_id': quiz_id}, {'$set': {"seconds": sec}})
+               count += 1
+           else:
+               quiz_collection.delete_one({"quiz_id": quiz_id})
+               qc = qcount_collection.find_one({})
+               q = int(qc['count'])
+               q -= 1
+               qcount_collection.update_one({}, {'$set': {"count": q}})
+               if q == 0:
+                   qcount_collection.update_one({}, {'$set': {"establish": 0}})
+        if bool(timer) != False:
+           timer = json.dumps(timer)
+           socket.emit('render', (timer, count))
 
 # def getuser():
 #     if 'auth_token' in request.cookies:
@@ -57,7 +146,6 @@ def server():
         currentuser = None
 
     quiz_list = convert_mongo_to_quizInput(currentuser)
-    print(quiz_list)
     response = make_response(render_template('index.html', hider=hideheader, username=user, question_list=quiz_list))
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.mimetype = 'text/html'
@@ -75,7 +163,6 @@ def question_form_page():
 
 
 @app.route('/submit-quiz-question', methods=['POST', 'GET'])
-
 def submit_quiz_question():
     if request.method == "POST":
         if 'auth_token' in request.cookies:
@@ -94,88 +181,45 @@ def submit_quiz_question():
                     minutes = html.escape(request.form.get('minutes-input'))
                     seconds = html.escape(request.form.get('seconds-input'))
                     all_options = [option1, option2, option3]
-
+                    if len(seconds) == 1:
+                       time = minutes + ":0" + seconds
+                    else:
+                       time = minutes + ":" + seconds
+                    seconds = int(minutes) * 60 + int(seconds)
+                    idc = count_collection.find_one({})
+                    qc = qcount_collection.find_one({})
+                    c = int(idc['id_count'])
+                    q = int(qc['count'])
+                    c += 1
+                    q += 1
+                    count_collection.update_one({}, {'$set': {"id_count": c}})
+                    qcount_collection.update_one({}, {'$set': {"count": q}})
+                    c = "quiz_" + str(c)
                     if "image-input" in request.files:
                         myfile = request.files['image-input']
                         path = "static/images/" + "quizimage" + str(ide) + ".jpg"
-                        myfile.save(path)
+                        # myfile.save(path)
                         quiz_collection.insert_one(
-                            {"id": ide, "image": path, "username": user, "title": title, "options": all_options, "minutes": minutes,
-                             "seconds": seconds, "answer": "option1"})
+                            {"id": ide, "image": path, "username": user, "title": title, "options": all_options, "time": time, "seconds": seconds, "quiz_id": c, "answer":"option1"})
                     else:
                         quiz_collection.insert_one(
-                            {"id": ide, "username": user, "title": title, "options": all_options, "minutes": minutes,
-                             "seconds": seconds, "answer": "option1"})
-
-    return redirect('/')
-@app.route('/submit-quiz-response', methods=['GET'])
-def submit_quiz_response():
-    print("idk")
-
-@app.route('/post-history', methods=['GET'])
-def getposts():
-    mylist = list(post_collection.find({}))
-    mylist.reverse()
-    print("test1")
-    return make_response(dumps(mylist))
-
-@app.route('/static/images', methods=['GET'])
-def double_secure_image():
-    print(request.path)
-    print("test2")
-    return
-
-
-@app.route('/make-post', methods=['POST', 'GET'])
-def makepost():
-    if request.method == "POST":
-        if 'auth_token' in request.cookies:
-            auth_token = request.cookies.get('auth_token')
-            if auth_token is not None:
-                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
-                check = auth_collection.find_one({"auth": hash_auth})
-                if check is not None:
-                    user = check['username']
-                    id = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
-                    title = html.escape(request.form.get('post-title'))
-                    message = html.escape(request.form.get('post-message'))
-
-                    post_collection.insert_one({"id": id, "username": user, "title": title, "message": message, "likes": 0})
+                            {"id": ide, "username": user, "title": title, "options": all_options, "time": time, "seconds": seconds, "quiz_id": c, "answer":"option1"})
+                    qcount_collection.insert_one({"establish": 1})
     return redirect('/')
 
-@app.route('/like', methods=['POST', 'GET'])
-def makelike():
-    print(request)
-    if request.method == "POST":
-        if 'auth_token' in request.cookies:
-            auth_token = request.cookies.get('auth_token')
-            if auth_token is not None:
-                hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
-                check = auth_collection.find_one({"auth": hash_auth})
-                if check is not None:
-                    user = check['username']
-                    idd = request.json
-                    idd = json.dumps(idd)
-                    print(idd)
 
+# @app.route('/post-history', methods=['GET'])
+# def getposts():
+#     mylist = list(post_collection.find({}))
+#     mylist.reverse()
+#     print("test1")
+#     return make_response(dumps(mylist))
 
-                    try:
-
-                        if auth_collection.find_one({"username": user})[idd] == 1:
-                            auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 0}})
-                            post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": -1}})
-
-                        else:
-
-                            auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 1}})
-                            post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": 1}})
-
-                    except:
-
-                        auth_collection.find_one_and_update({"username": user}, {"$set": {idd: 1}})
-                        post_collection.find_one_and_update({"id": int(idd)}, {"$inc": {"likes": 1}})
-
-    return redirect('/')
+# @app.route('/static/images', methods=['GET'])
+# def double_secure_image():
+#     print(request.path)
+#     print("test2")
+#     return
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -189,7 +233,7 @@ def register():
         pwd = request.form.get('password_reg')
         salt = bcrypt.gensalt()
         pwd = bcrypt.hashpw(pwd.encode(), salt)
-        auth_collection.insert_one({"username": user, "password": pwd})
+        auth_collection.insert_one({"username": user, "password": pwd, 'questions': [], 'quiz_list': []})
         return redirect('/')
 
 
@@ -217,4 +261,5 @@ def login():
             return ser
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    #app.run(host='0.0.0.0', port=8080)
+    socket.run(app, debug=True, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)

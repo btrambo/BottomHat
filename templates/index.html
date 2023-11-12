@@ -26,6 +26,7 @@
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 
 
 </head>
@@ -142,76 +143,66 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ input.title }}</h5>
                         <h6 class="card-subtitle mb-2 ">{{ input.username }}</h6>
+                        <p id = {{ input.quiz_id }} class="align-text-bottom card-footer">{{ input.time }}</p>
                         <p class="card-text" id="multiple-choice-text">
                         <div class="row" >
                             <div class="col">
-                                <form action="/submit-quiz-answer" method="post"
-                                      enctype="application/x-www-form-urlencoded">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               name="question_multiple_choice"
-                                               id="multiple-choice-1"
-                                               value="option1">
+                                                name="multiple_choice"
+                                                id="multiple-choice-1"
+                                                value="{{ input.quiz_id }},option1">
                                         <label class="form-check-label" for="multiple-choice-1">
                                             {{ input.options[0] }}
                                         </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               name="question_multiple_choice"
-                                               id="multiple-choice-2"
-                                               value="option2">
+                                                name="multiple_choice"
+                                                id="multiple-choice-2"
+                                                value="{{ input.quiz_id }},option2">
                                         <label class="form-check-label" for="multiple-choice-2">
                                             {{ input.options[1] }}
                                         </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               name="question_multiple_choice"
-                                               id="multiple-choice-3"
-                                               value="option3">
+                                                name="multiple_choice"
+                                                id="multiple-choice-3"
+                                                value="{{ input.quiz_id }},option3">
                                         <label class="form-check-label" for="multiple-choice-3">
                                             {{ input.options[2] }}
                                         </label>
                                     </div>
-                                    <input style="display:{{ input.show2 }}" class="btn" type="submit" value="Submit">
-
+                                    <button onclick="getValue()">Submit</button>
+                                    <!-- <input style="display:{{ input.show2 }}" class="btn" type="submit" value="Submit"> -->
                                 </form>
                             </div>
                             <div class="col" id="user-image">
-                        <img style="display:{{ input.showimage }}" src="{{ input.image }}" alt="quiz image here" class="my_image"/>
-
+                        <!-- <img style="display:{{ input.showimage }}" src="{{ input.image }}" alt="quiz image here" class="my_image"/> -->
                             </div>
                         </div>
-
-
                         </p>
-                        <div style="display:{{ input.show2 }}"><div id="win"><p class="congrats">CONGRATULATIONS!</p>
+                        <!-- <div style="display:{{ input.show2 }}"><div id="win"><p class="congrats">CONGRATULATIONS!</p>
                             <p>You received 1 point for this question.</p></div>
                             <div id="lose"><p class="fail">TRY HARDER!</p>
-                            <p>You received 0 points for this question.</p></div>
-
-
+                            <p>You received 0 points for this question.</p></div> -->
                         </div>
-                <div id="yourq" style="display:{{ input.show3 }}"> <p>(This is your question. You cannot answer it.)</p></div>
-
+                <!-- <div id="yourq" style="display:{{ input.show3 }}"> <p>(This is your question. You cannot answer it.)</p></div> -->
                     </div>
                     <div class="card-grades">
-                         <div class="row">
+                         <!-- <div class="row">
                             <div class="col" style="color:burlywood !important; font-size: x-large !important;">
                                 User:
                                 </div>
                               <div class="col" style="color:burlywood !important; font-size: x-large !important;">
                                   GRADE
                                 </div>
-                                </div>
-
-
+                                </div> -->
                     </div>
-                    <div id="qfoot" style="display:{{ input.show }}"><div id="footcard" onclick="seeGrades(this)"><p class="footcardtext">See your question's submissions.</p><p class="footcardtext2">Go back to the question.</p></div></div>
+                    <!-- <div id="qfoot" style="display:{{ input.show }}"><div id="footcard" onclick="seeGrades(this)"><p class="footcardtext">See your question's submissions.</p><p class="footcardtext2">Go back to the question.</p></div></div> -->
                 </div>
             </div>
-
             {% endfor %}
         </div>
 
@@ -220,6 +211,49 @@
         </div>
     </div>
 </div>
+
+<!-- , rememberTransport: false, transports : ['websocket'] -->
+<script type="text/javascript" charset="utf-8">
+    socket = io({autoConnect: false, rememberTransport: false, transports : ['websocket']});
+
+    socket.connect();
+
+    // socket.on('connect',function() {
+    //     socket.emit('connect');
+    // });
+
+    setInterval(function() {
+        socket.emit('reload');
+	}, 1000) 
+
+    function getValue() {
+        var answer = document.getElementsByName('multiple_choice')
+        for (i = 0; i < answer.length; i++) {
+            if (answer[i].checked) {
+                console.log(answer[i].value)
+                answer = JSON.stringify(answer[i].value)
+                socket.emit('submit', answer)
+            }
+        }
+    }
+    
+    socket.on('render', function(timer, count) {
+        timer = JSON.parse(timer)
+        for (let i = 0; i < count; i++) {
+            //console.log(timer[i])
+            id = timer[i][0]
+            check = document.getElementById(id);
+            if (check != null) {
+                document.getElementById(id).innerHTML = timer[i][1];
+            }
+        }
+    });
+
+    socket.on('test', function(testing_var) {
+        console.log(testing_var)
+    });
+
+</script>
 <script src="/static/script.js"></script>
 
 </body>
