@@ -49,7 +49,7 @@ def convert_mongo_to_quizInput(currentuser):
             image = document["image"]
             showimage = "flex"
         except:
-            image = "none"
+            image = "static/images/elephant-small.jpg"
             showimage = "none"
         # document = quizInput(usernames,titles,questions,answers,seconds, time, quiz_id,ide,showbutton,showbutton2, showbutton3, showimage, image)
         document = quizInput(titles, usernames, questions, answers, seconds, time, quiz_id, ide, showbutton, showbutton2, showbutton3, showimage, image)

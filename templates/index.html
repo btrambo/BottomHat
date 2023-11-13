@@ -146,6 +146,7 @@
                         <p class="card-text" id="multiple-choice-text">
                         <div class="row" >
                             <div class="col">
+
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
                                                 name="multiple_choice"
@@ -188,6 +189,7 @@
                             <p>You received 0 points for this question.</p></div>
                         </div>
                 <div id="y{{ input.quiz_id }}" class="orange" style="display: none"> <p>(This is your question. You cannot answer it.)</p></div>
+                        <div id="mm{{ input.quiz_id }}" class="whi" style="display: none"> <p>(Thank you! Your answer is currently being graded.)</p></div>
                     </div>
                     <div id="g{{ input.quiz_id }}" class="card-grades">
 
@@ -220,6 +222,9 @@
 	}, 1000)
 
     function getValue() {
+
+
+
         var answer = document.getElementsByName('multiple_choice')
         for (i = 0; i < answer.length; i++) {
             if (answer[i].checked) {
@@ -252,6 +257,14 @@
 
         const notmine = bigvar0[1]
 
+        let ansq = bigvar0[2]
+
+        for (let i of ansq) {
+
+            document.getElementById("b" + i).style.display = "none"
+            document.getElementById("mm" + i).style.display = "flex"
+        }
+
 
 
             console.log(notmine)
@@ -263,11 +276,15 @@
             for (let i of losing) {
 
                 document.getElementById("l" + i).style.display = "block"
+                document.getElementById("mm" + i).style.display = "none"
+                document.getElementById("b" + i).style.display = "none"
             }
 
             for (let i of winning) {
 
                 document.getElementById("w" + i).style.display = "block"
+                document.getElementById("mm" + i).style.display = "none"
+                document.getElementById("b" + i).style.display = "none"
             }
 
 

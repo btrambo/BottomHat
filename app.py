@@ -80,9 +80,9 @@ def handle_reload():
                 check = auth_collection.find_one({"auth": hash_auth})
                 if check is not None:
                     currentuser = check['username']
-                    mysid = request.sid
-                    myvar = 42
-                    socket.emit('santa', myvar, to=mysid)
+                    # mysid = request.sid
+                    # myvar = 42
+                    # socket.emit('santa', myvar, to=mysid)
 
     quiz = convert_mongo_to_quizInput(currentuser)
 
@@ -101,7 +101,13 @@ def handle_reload():
         notcreatedlost = []
         notcreatedwon = []
         winnersperquiz = {}
+        answeredquestions = []
+
+        for i in auth_collection.find_one({"username": currentuser})["quiz_list"]:
+            answeredquestions.append(i)
+
         players = auth_collection.find()
+
         for i in quiz:
             if i.username == currentuser:
                 createdquizzes[i.quiz_id] = i.correct_response
@@ -132,9 +138,9 @@ def handle_reload():
                             if wow[0] in winnersperquiz:
                                 winnersperquiz[wow[0]].append((i["username"], "0"))
                             else: winnersperquiz[wow[0]] = [(i["username"], "0")]
-        for i in createdquizzes:
+        for i in createdqlist:
             for ii in players:
-                if i not in ii["quiz_list"] and ii != currentuser:
+                if i not in ii["quiz_list"] and ii["username"] != currentuser and quiz_collection.find_one({"quiz_id": i})["status"] == "0":
                     if i in winnersperquiz:
                         winnersperquiz[i].append((ii["username"], "0"))
                     else:
@@ -146,7 +152,7 @@ def handle_reload():
         # myvars = json.dumps(winnersperquiz)
         # allmyquizzes = json.dumps(createdquizzes)
 
-        tosend = [[winnersperquiz, createdqlist], [notcreatedwon, notcreatedlost]]
+        tosend = [[winnersperquiz, createdqlist], [notcreatedwon, notcreatedlost], answeredquestions]
 
         jtosend = json.dumps(tosend)
 
@@ -168,6 +174,21 @@ def handle_reload():
         if timeleft <= 0:
             totaltime = "0:00"
             quiz_collection.find_one_and_update({"quiz_id": quiz_id}, {'$set':{ "status" : '0'}})
+            authors = auth_collection.find()
+            for ii in authors:
+                if quiz_id not in ii["quiz_list"] and i.username != ii["username"]:
+                    newarr = ii["quiz_list"]
+                    newarr.append(quiz_id)
+                    # ii["quiz_list"] = newarr
+                    auth_collection.find_one_and_update({"username": ii["username"]}, {'$set': {"quiz_list": newarr}})
+
+                    newarr2 = ii["questions"]
+                    newarr2.append([quiz_id, "noanswer"])
+
+                    auth_collection.find_one_and_update({"username": ii["username"]}, {'$set': {"questions": newarr2}})
+
+
+
         else:
             min1 = math.floor(timeleft / 60)
             sec1 = timeleft - (min1 * 60)
@@ -262,6 +283,7 @@ def question_form_page():
     return response
 
 
+
 @app.route('/submit-quiz-question', methods=['POST', 'GET'])
 
 def submit_quiz_question():
@@ -283,7 +305,14 @@ def submit_quiz_question():
                     seconds = html.escape(request.form.get('seconds-input'))
                     answer = request.form.get("answer")
                     all_options = [option1, option2, option3]
-
+                    # if seconds == "":
+                    #     seconds = 0
+                    # if minutes == "":
+                    #     minutes = 0
+                    if seconds.isnumeric() == False:
+                        seconds = "0"
+                    if minutes.isnumeric() == False:
+                        minutes = "0"
                     mytime = time.time()
                     mymin = float(minutes) * 60
                     futuretime = float(mymin) + float(seconds) + mytime

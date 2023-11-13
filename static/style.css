@@ -39,6 +39,16 @@ path#path4 {
     background-color: #3f3f3f !important;
     color: white !important;
 }
+
+
+
+.btn:focus{
+    background-color: #222222 !important;
+
+}
+
+
+
 input{
     background-color: #282828 !important; /* Change to your desired color */
     color: white !important; /* Change the text color if needed */
@@ -148,10 +158,21 @@ select:focus {
     margin-bottom: 10px;
 }
 
+.whi {
+
+    justify-content: center;
+}
 .orange {
     justify-content: center;
 }
 
+.whi p {
+
+    font-size: smaller;
+    color: grey;
+    font-style: italic;
+
+}
 .orange p {
 
     font-size: smaller;
