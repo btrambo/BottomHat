@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-mongo_client = MongoClient('mongo')
+mongo_client = MongoClient('localhost')
 db = mongo_client['cse312']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:
@@ -51,8 +51,8 @@ def convert_mongo_to_quizInput(currentuser):
         except:
             image = "none"
             showimage = "none"
-        document = quizInput(usernames,titles,questions,answers,seconds, time, quiz_id,ide,showbutton,showbutton2, showbutton3, showimage, image)
-
+        # document = quizInput(usernames,titles,questions,answers,seconds, time, quiz_id,ide,showbutton,showbutton2, showbutton3, showimage, image)
+        document = quizInput(titles, usernames, questions, answers, seconds, time, quiz_id, ide, showbutton, showbutton2, showbutton3, showimage, image)
         arr.append(document)
 
     return arr

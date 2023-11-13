@@ -151,16 +151,25 @@ select:focus {
     margin-bottom: 10px;
 }
 
-#yourq p {
+.orange {
+    justify-content: center;
+}
+
+.orange p {
 
     font-size: smaller;
     color: orange;
     font-style: italic;
+
 }
 
 .my_image {
 
     width: 100%;
+}
+
+.card-grades {
+    flex-direction: column;
 }
 
 

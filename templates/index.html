@@ -21,9 +21,6 @@
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
             crossorigin="anonymous"></script>
 
-    <script type="text/javascript" src="Scripts/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
-
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -133,17 +130,19 @@
 
         <!---middle Container--->
         <div class="col-8 text-center" id="post-feed">
-            <h2>FEED</h2>
+            <h2>QUIZ FEED</h2>
             <div id="post-wrap"></div>
 
             <!--  iterate though a list of type quiz_inputs -->
             {% for input in question_list %}
             <div id="quiz-feed">
-                <div class="card" id="q{{ input.id }}">
+                <div class="card" id="q{{ input.quiz_id }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ input.title }}</h5>
                         <h6 class="card-subtitle mb-2 ">{{ input.username }}</h6>
-                        <p id = {{ input.quiz_id }} class="align-text-bottom card-footer">{{ input.time }}</p>
+                       <!-- <p id = {{ input.quiz_id }} class="align-text-bottom card-footer">{{ input.time }}</p> -->
+                        <p id = {{ input.quiz_id }} class="align-text-bottom card-footer"></p>
+
                         <p class="card-text" id="multiple-choice-text">
                         <div class="row" >
                             <div class="col">
@@ -174,8 +173,8 @@
                                             {{ input.options[2] }}
                                         </label>
                                     </div>
-                                    <button onclick="getValue()">Submit</button>
-                                    <!-- <input style="display:{{ input.show2 }}" class="btn" type="submit" value="Submit"> -->
+                                    <!-- <button onclick="getValue()">Submit</button> -->
+                                     <input id="b{{ input.quiz_id }}" style="display: inline-block" class="btn" type="submit" onclick="getValue()" value="Submit">
                                 </form>
                             </div>
                             <div class="col" id="user-image">
@@ -183,24 +182,17 @@
                             </div>
                         </div>
                         </p>
-                        <!-- <div style="display:{{ input.show2 }}"><div id="win"><p class="congrats">CONGRATULATIONS!</p>
+                         <div><div id="win" style="display: none"><p class="congrats">CONGRATULATIONS!</p>
                             <p>You received 1 point for this question.</p></div>
-                            <div id="lose"><p class="fail">TRY HARDER!</p>
-                            <p>You received 0 points for this question.</p></div> -->
+                            <div id="lose" style="display: none"><p class="fail">TRY HARDER!</p>
+                            <p>You received 0 points for this question.</p></div>
                         </div>
-                <!-- <div id="yourq" style="display:{{ input.show3 }}"> <p>(This is your question. You cannot answer it.)</p></div> -->
+                <div id="y{{ input.quiz_id }}" class="orange" style="display: none"> <p>(This is your question. You cannot answer it.)</p></div>
                     </div>
-                    <div class="card-grades">
-                         <!-- <div class="row">
-                            <div class="col" style="color:burlywood !important; font-size: x-large !important;">
-                                User:
-                                </div>
-                              <div class="col" style="color:burlywood !important; font-size: x-large !important;">
-                                  GRADE
-                                </div>
-                                </div> -->
+                    <div id="g{{ input.quiz_id }}" class="card-grades">
+
                     </div>
-                    <!-- <div id="qfoot" style="display:{{ input.show }}"><div id="footcard" onclick="seeGrades(this)"><p class="footcardtext">See your question's submissions.</p><p class="footcardtext2">Go back to the question.</p></div></div> -->
+                    <div id="f{{ input.quiz_id }}" style="display: none"><div id="footcard" onclick="seeGrades(this)"><p class="footcardtext">See your question's submissions.</p><p class="footcardtext2">Go back to the question.</p></div></div>
                 </div>
             </div>
             {% endfor %}
@@ -211,6 +203,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- , rememberTransport: false, transports : ['websocket'] -->
 <script type="text/javascript" charset="utf-8">
@@ -224,7 +217,7 @@
 
     setInterval(function() {
         socket.emit('reload');
-	}, 1000) 
+	}, 1000)
 
     function getValue() {
         var answer = document.getElementsByName('multiple_choice')
@@ -244,9 +237,71 @@
             id = timer[i][0]
             check = document.getElementById(id);
             if (check != null) {
-                document.getElementById(id).innerHTML = timer[i][1];
-            }
+
+                document.getElementById(id).innerHTML = timer[i][1];}
+             else {location.reload()}
+
         }
+    });
+
+    socket.on('santa', function(myvar4) {
+
+        let bigvar = JSON.parse(myvar4)
+
+        let myvar2 = bigvar[0]
+        console.log(myvar2)
+        console.log("users")
+
+        let myquizzes = bigvar[1]
+
+        console.log(myquizzes)
+        console.log("myquizzes")
+
+
+
+
+        let bigstring1 = "<div className = \"row\">" + "<div class=\"col\" style=\"color:burlywood !important; font-size: x-large !important;\">"
+        let bigstring2 =  "<div class=\"col\" style=\"color:burlywood !important; font-size: x-large !important;\">"
+        let divend = "</div>"
+
+        let targetid = ""
+
+        let nonb = "&nbsp;"
+
+        console.log(myquizzes)
+
+        for (let key of myquizzes) {
+            let footerid = "f" + key
+            let buttonid = "b" + key
+            let messageid = "y" + key
+                if (footerid != null && footerid !== "") {
+                document.getElementById(footerid).style.display = "flex"
+                document.getElementById(footerid).style.justifyContent = "right"
+                document.getElementById(buttonid).style.display = "none"
+                document.getElementById(messageid).style.display = "flex"}
+        }
+            for (const key in myvar2) {
+
+                let finishedstring = bigstring1 + "USER" + nonb + nonb + nonb + nonb + nonb + "SCORE" + divend + divend
+
+                targetid = "g" + key
+
+
+                for (let i of myvar2[key]) {
+                    console.log(i)
+                    console.log(myvar2[key][0][0])
+                    let eatme = bigstring1 + i[0] + nonb + nonb + nonb + nonb + nonb +nonb + nonb + nonb + nonb + nonb + nonb + nonb + i[1] +  divend + divend
+                    console.log(key)
+                    console.log(eatme)
+                    finishedstring += eatme
+                }
+                 if (targetid != null && targetid !== "") {
+         document.getElementById(targetid).innerHTML = finishedstring }
+            }
+
+
+
+
     });
 
     socket.on('test', function(testing_var) {

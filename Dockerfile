@@ -1,4 +1,3 @@
-
 FROM python:3.8.2
 ENV HOME /root
 WORKDIR /root
