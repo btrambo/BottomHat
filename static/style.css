@@ -97,10 +97,7 @@ select:focus {
     font-weight: 600;
 }
 
-#lose {
-    display: none;
 
-}
 
 #qfoot {
     display: flex;

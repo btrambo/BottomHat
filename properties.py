@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-mongo_client = MongoClient('localhost')
+mongo_client = MongoClient('mongo')
 db = mongo_client['cse312']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 class quizInput:

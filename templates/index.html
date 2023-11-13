@@ -182,9 +182,9 @@
                             </div>
                         </div>
                         </p>
-                         <div><div id="win" style="display: none"><p class="congrats">CONGRATULATIONS!</p>
+                         <div><div id="w{{ input.quiz_id }}" class="win" style="display: none"><p class="congrats">CONGRATULATIONS!</p>
                             <p>You received 1 point for this question.</p></div>
-                            <div id="lose" style="display: none"><p class="fail">TRY HARDER!</p>
+                            <div id="l{{ input.quiz_id }}" class="lose" style="display: none"><p class="fail">TRY HARDER!</p>
                             <p>You received 0 points for this question.</p></div>
                         </div>
                 <div id="y{{ input.quiz_id }}" class="orange" style="display: none"> <p>(This is your question. You cannot answer it.)</p></div>
@@ -246,16 +246,42 @@
 
     socket.on('santa', function(myvar4) {
 
-        let bigvar = JSON.parse(myvar4)
+        let bigvar0 = JSON.parse(myvar4)
+
+        let bigvar = bigvar0[0]
+
+        const notmine = bigvar0[1]
+
+
+
+            console.log(notmine)
+
+            let winning = notmine[0]
+            let losing = notmine[1]
+
+
+            for (let i of losing) {
+
+                document.getElementById("l" + i).style.display = "block"
+            }
+
+            for (let i of winning) {
+
+                document.getElementById("w" + i).style.display = "block"
+            }
+
+
+
+
 
         let myvar2 = bigvar[0]
-        console.log(myvar2)
-        console.log("users")
+        // console.log(myvar2)
+        // console.log("users")
 
         let myquizzes = bigvar[1]
 
-        console.log(myquizzes)
-        console.log("myquizzes")
+        // console.log(myquizzes)
+        // console.log("myquizzes")
 
 
 
@@ -268,7 +294,7 @@
 
         let nonb = "&nbsp;"
 
-        console.log(myquizzes)
+        // console.log(myquizzes)
 
         for (let key of myquizzes) {
             let footerid = "f" + key
@@ -288,11 +314,11 @@
 
 
                 for (let i of myvar2[key]) {
-                    console.log(i)
-                    console.log(myvar2[key][0][0])
+                    // console.log(i)
+                    // console.log(myvar2[key][0][0])
                     let eatme = bigstring1 + i[0] + nonb + nonb + nonb + nonb + nonb +nonb + nonb + nonb + nonb + nonb + nonb + nonb + i[1] +  divend + divend
-                    console.log(key)
-                    console.log(eatme)
+                    // console.log(key)
+                    // console.log(eatme)
                     finishedstring += eatme
                 }
                  if (targetid != null && targetid !== "") {

@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'verysecretencrypt!'
 app.config['UPLOAD_PATH'] = 'static/images/'
 socket = SocketIO(app)
-mongo_client = MongoClient("localhost")
+mongo_client = MongoClient("mongo")
 db = mongo_client['cse312']
 chat_collection = db['chat']
 count_collection = db['count']
@@ -98,12 +98,26 @@ def handle_reload():
         # list of players in format: [player,score]
         createdquizzes = {}
         createdqlist = []
+        notcreatedlost = []
+        notcreatedwon = []
         winnersperquiz = {}
         players = auth_collection.find()
         for i in quiz:
             if i.username == currentuser:
                 createdquizzes[i.quiz_id] = i.correct_response
                 createdqlist.append(i.quiz_id)
+            else:
+                if quiz_collection.find_one({"quiz_id": i.quiz_id})["status"] == "0":
+                   if i.quiz_id in auth_collection.find_one({"username": currentuser})["quiz_list"]:
+                       for ii in auth_collection.find_one({"username": currentuser})["questions"]:
+                           if ii[0] == i.quiz_id and ii[1] == i.correct_response:
+                               notcreatedwon.append(ii[0])
+                           elif ii[0] == i.quiz_id and ii[1] != i.correct_response:
+                               notcreatedlost.append(i.quiz_id)
+                   else:
+                        notcreatedlost.append(i.quiz_id)
+
+
 
         for i in players:
             ansquestions = i["questions"]
@@ -132,7 +146,7 @@ def handle_reload():
         # myvars = json.dumps(winnersperquiz)
         # allmyquizzes = json.dumps(createdquizzes)
 
-        tosend = (winnersperquiz, createdqlist)
+        tosend = [[winnersperquiz, createdqlist], [notcreatedwon, notcreatedlost]]
 
         jtosend = json.dumps(tosend)
 
