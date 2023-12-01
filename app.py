@@ -402,5 +402,5 @@ def login():
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=8080)
-    socket.run(app, debug=True, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
+    socket.run(app, debug=False, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
     #socket.run(app, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
