@@ -303,9 +303,7 @@ def question_form_page():
     return response
 
 
-
 @app.route('/submit-quiz-question', methods=['POST', 'GET'])
-
 def submit_quiz_question():
     if request.method == "POST":
         if 'auth_token' in request.cookies:
@@ -400,9 +398,7 @@ def register():
 @app.route('/send_email', methods=['POST', 'GET'])
 def send_email():
     if request.method == "POST":
-        print("ARE WE EVEN HERE")
-        user_email = request.form.get('email_input')
-        print("EMAIL SHOULD PRINT NEXT TO THIS",user_email)
+        user_email = request.form.get('email-input')
         user_credentials = get_user_credentials()
         # send the email
         token = secrets.token_urlsafe(80)
@@ -414,7 +410,6 @@ def send_email():
             "text": f'To verify your email, click the following link: {url_for("verify_email", token=token, _external=True)}',
             "to": [{"email": user_email}],
         }
-
         try:
             mailchimp = MailchimpTransactional.Client(secretkey)
             response = mailchimp.messages.send({"message": message})
@@ -425,12 +420,15 @@ def send_email():
         except ApiClientError as error:
             print('An exception occurred: {}'.format(error.text))
 
+
 @app.route('/verify_email/<token>', methods=['GET'])
 def verify_email(token):
-    username = email_verification_tokens.find_one({"token":token})
+    email_token_document = email_verification_tokens.find_one({"token": token})
+    username = email_token_document['user']
     auth_collection.update_one({'username': username}, {'$set': {"email_verified": True}})
-    print("it worked")
-
+    ser = make_response(redirect('/'))
+    ser.mimetype = 'text/html'
+    return ser
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -455,6 +453,7 @@ def login():
             ser = make_response(redirect('/'))
             ser.mimetype = 'text/html'
             return ser
+
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=8080)
