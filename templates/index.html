@@ -46,7 +46,7 @@
 
                     <!---middle left side--->
                     <div class="col-6 text-start" id="left-topnavbar-column">
-                        <h1>CSE 312 Bottom Hat</h1>
+                        <h1>Bottom Hat</h1>
                     </div>
                     <!---middle right side--->
                     <div class="col-6 text-end" id="right-topnavbar-column">
@@ -55,8 +55,30 @@
                                 <a class="btn " href="{{ url_for('question_form_page') }}" role="button">Submit
                                     Question</a>
                             </div>
-                            <div class="col-3">
 
+
+                            {% if username != "Guest" and verified_email == False %}
+                            <div class="col-3">
+                                <div class="dropdown" id="email-dropdown">
+                                    <button class="btn dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        Verify Email
+                                    </button>
+                                    <ul class="dropdown-menu topnavbar-userinput" id="email-drop">
+                                        <form action="/send_email" method="post" enctype="application/x-www-form-urlencoded">
+                                            <label>Email Address:
+                                                <input id="verify-email-address" type="email" name="email-input"/>
+                                            </label>
+                                            <br/>
+                                            <input type="submit" value="Post">
+                                        </form>
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endif %}
+
+
+                            <div class="col-3">
                                 <div class="dropdown" id="login-dropdown">
                                     <button class="btn dropdown-toggle" type="button"
                                             data-bs-toggle="dropdown" aria-expanded="false">

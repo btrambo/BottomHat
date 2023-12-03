@@ -1,7 +1,7 @@
 import json
 import time
 
-from flask import Flask, render_template, make_response, request, send_from_directory, redirect
+from flask import Flask, render_template, make_response, request, send_from_directory, redirect, url_for
 from pymongo import MongoClient
 import bcrypt
 import secrets
@@ -13,7 +13,8 @@ from flask_socketio import SocketIO, send, emit
 import os
 import math
 from werkzeug.utils import secure_filename
-
+import mailchimp_transactional as MailchimpTransactional
+from mailchimp_transactional.api_client import ApiClientError
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'verysecretencrypt!'
@@ -26,6 +27,7 @@ count_collection = db['count']
 auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
+email_verification_tokens = db['email-tokens']
 clients = []
 
 
@@ -246,8 +248,25 @@ def handle_reload():
 #         hideheader = "none"
 #         return None
 
+
+def get_user_credentials():
+    if 'auth_token' in request.cookies:
+        auth_token = request.cookies.get('auth_token')
+        if auth_token is not None:
+            hash_auth = hashlib.sha256(auth_token.encode()).hexdigest()
+            check = auth_collection.find_one({"auth": hash_auth})
+            if check is not None:
+                return check
+            else:
+                user = 'Guest'
+                return None
+    else:
+        user = 'Guest'
+        return None
+
 @app.route('/')
 def server():
+    verified_email = None
     if 'auth_token' in request.cookies:
         auth_token = request.cookies.get('auth_token')
         if auth_token is not None:
@@ -255,6 +274,7 @@ def server():
             check = auth_collection.find_one({"auth": hash_auth})
             if check is not None:
                 user = check['username']
+                verified_email = check['email_verified']
                 hideheader = "block"
                 currentuser = user
             else:
@@ -267,7 +287,7 @@ def server():
         currentuser = None
 
     quiz_list = convert_mongo_to_quizInput(currentuser)
-    response = make_response(render_template('index.html', hider=hideheader, username=user, question_list=quiz_list))
+    response = make_response(render_template('index.html', hider=hideheader, username=user, question_list=quiz_list, verified_email=verified_email))
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.mimetype = 'text/html'
     response.status_code = 200
@@ -373,8 +393,44 @@ def register():
         pwd = request.form.get('password_reg')
         salt = bcrypt.gensalt()
         pwd = bcrypt.hashpw(pwd.encode(), salt)
-        auth_collection.insert_one({"username": user, "password": pwd, 'questions': [], 'quiz_list': []})
+        auth_collection.insert_one({"username": user, "password": pwd, 'questions': [], 'quiz_list': [], "email_verified": False})
         return redirect('/')
+
+
+@app.route('/send_email', methods=['POST', 'GET'])
+def send_email():
+    if request.method == "POST":
+        print("ARE WE EVEN HERE")
+        user_email = request.form.get('email_input')
+        print("EMAIL SHOULD PRINT NEXT TO THIS",user_email)
+        user_credentials = get_user_credentials()
+        # send the email
+        token = secrets.token_urlsafe(80)
+        email_verification_tokens.insert_one({"user": user_credentials['username'], "token":token})
+
+        message = {
+            "from_email": "verify@bottomhat.net",
+            "subject": "Please verify your email",
+            "text": f'To verify your email, click the following link: {url_for("verify_email", token=token, _external=True)}',
+            "to": [{"email": user_email}],
+        }
+
+        try:
+            mailchimp = MailchimpTransactional.Client(secretkey)
+            response = mailchimp.messages.send({"message": message})
+            print('API called successfully: {}'.format(response))
+            ser = make_response(redirect('/'))
+            ser.mimetype = 'text/html'
+            return ser
+        except ApiClientError as error:
+            print('An exception occurred: {}'.format(error.text))
+
+@app.route('/verify_email/<token>', methods=['GET'])
+def verify_email(token):
+    username = email_verification_tokens.find_one({"token":token})
+    auth_collection.update_one({'username': username}, {'$set': {"email_verified": True}})
+    print("it worked")
+
 
 
 @app.route('/login', methods=['POST', 'GET'])
