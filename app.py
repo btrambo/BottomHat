@@ -19,7 +19,7 @@ from mailchimp_transactional.api_client import ApiClientError
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'verysecretencrypt!'
 app.config['UPLOAD_PATH'] = 'static/images/'
-socket = SocketIO(app)
+socket = SocketIO(app, cors_allowed_origins="https://bottomhat.net")
 mongo_client = MongoClient("mongo")
 db = mongo_client['cse312']
 chat_collection = db['chat']
