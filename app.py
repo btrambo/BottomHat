@@ -308,17 +308,27 @@ def server():
                 verified_email = check['email_verified']
                 hideheader = "block"
                 currentuser = user
+                if not verified_email:
+                    nov = "block"
+                    yesv = "none"
+                else:
+                    nov = "none"
+                    yesv = "block"
             else:
                 user = 'Guest'
+                yesv = "none"
+                nov = "none"
                 hideheader = "none"
                 currentuser = None
     else:
         user = 'Guest'
+        yesv = "none"
+        nov = "none"
         hideheader = "none"
         currentuser = None
 
     quiz_list = convert_mongo_to_quizInput(currentuser)
-    response = make_response(render_template('index.html', hider=hideheader, username=user, question_list=quiz_list, verified_email=verified_email))
+    response = make_response(render_template('index.html', hider=hideheader, verified=yesv, unverified=nov, username=user, question_list=quiz_list, verified_email=verified_email))
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.mimetype = 'text/html'
     response.status_code = 200

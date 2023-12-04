@@ -190,7 +190,25 @@ select:focus {
     flex-direction: column;
 }
 
+#notverified {
 
+    font-size: 1.2rem;
+    margin-top: 15px;
+    font-style: italic;
+    color: bisque;
+}
+
+#verified {
+
+    font-size: 1.2rem;
+    margin-top: 15px;
+    font-style: italic;
+    color: plum;
+}
+
+.row {
+    flex-wrap: nowrap !important;
+}
 
 /*path#path4:hover {*/
 /*    fill: red;*/
