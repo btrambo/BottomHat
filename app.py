@@ -19,7 +19,13 @@ from mailchimp_transactional.api_client import ApiClientError
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'verysecretencrypt!'
 app.config['UPLOAD_PATH'] = 'static/images/'
+
+#Comment-out the below line before running locally
 socket = SocketIO(app, cors_allowed_origins="https://bottomhat.net")
+
+#Comment-out the below line before deploying
+#socket = SocketIO(app)
+
 mongo_client = MongoClient("mongo")
 db = mongo_client['cse312']
 chat_collection = db['chat']
@@ -474,6 +480,19 @@ def verify_email(token):
     return ser
 
 
+# @app.route('/static/<path>', methods=['GET', "POST"])
+# def set_sniff(path):
+#     filetype = path.split('.')[-1]
+#
+#     if (filetype == "css"):
+#         response = make_response(render_template('create-quiz.html'))
+#         response.headers['X-Content-Type-Options'] = 'nosniff'
+#         response.mimetype = 'text/html'
+#         response.status_code = 200
+#         return response
+#
+#         response.headers['X-Content-Type-Options'] = 'nosniff'
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == "POST":
@@ -496,6 +515,12 @@ def login():
             ser = make_response(redirect('/'))
             ser.mimetype = 'text/html'
             return ser
+
+
+@app.after_request
+def set_secure_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 if __name__ == '__main__':
