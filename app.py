@@ -28,6 +28,8 @@ auth_collection = db['auth']
 post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 email_verification_tokens = db['email-tokens']
+ip_collection = db['ip']
+ips = []
 clients = []
 
 
@@ -266,6 +268,33 @@ def get_user_credentials():
 
 @app.route('/')
 def server():
+    ip = request.headers.get('Client-IP')
+    ip = "hello"
+    if ip not in ips:
+        ips.append(ip)
+        t = time.time()
+        x = t + 10
+        y = t + 30
+        ip_collection.insert_one({'ip': ip, 'amount':1, 'ban': round(y), 'time': round(x)})
+    elif ip in ips:
+        j = ip_collection.find_one({"ip": ip})
+        s = j['ban']
+        k = j['amount']
+        t = j['time']
+        k += 1
+        socket.emit('test',k)
+        if k > 5:
+            if round(s - time.time()) > 0:
+                return "Too Many Requests", 429
+            else:
+                ip_collection.delete_one({'ip': ip})
+                ips.remove(ip)
+        else:
+            if round(t - time.time()) < 10:
+                ip_collection.update_one({'ip': ip}, {'$set': {"amount": k}})
+            else:
+                ip_collection.delete_one({'ip': ip})
+                ips.remove(ip)
     verified_email = None
     if 'auth_token' in request.cookies:
         auth_token = request.cookies.get('auth_token')
