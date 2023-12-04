@@ -270,13 +270,13 @@ def get_user_credentials():
 def server():
     ip = request.headers.get('Client-IP')
     ip = "hello"
-    if ip not in ips:
+    if ip_collection.find_one({"ip": ip}) == None:
         ips.append(ip)
         t = time.time()
         x = t + 10
         y = t + 30
         ip_collection.insert_one({'ip': ip, 'amount':1, 'ban': round(y), 'time': round(x)})
-    elif ip in ips:
+    else:
         j = ip_collection.find_one({"ip": ip})
         s = j['ban']
         k = j['amount']
