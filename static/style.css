@@ -210,6 +210,11 @@ select:focus {
     flex-wrap: nowrap !important;
 }
 
+.g-3{
+    flex-wrap: wrap !important;
+
+}
+
 /*path#path4:hover {*/
 /*    fill: red;*/
 /*}*/
