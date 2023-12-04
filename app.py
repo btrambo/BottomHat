@@ -29,8 +29,10 @@ post_collection = db['post']
 quiz_collection = db['quiz-questions'] # each document contains username, title, questions, correct answer
 email_verification_tokens = db['email-tokens']
 ip_collection = db['ip']
-ips = []
+
 clients = []
+
+
 
 
 @socket.on('connect')
@@ -269,9 +271,9 @@ def get_user_credentials():
 @app.route('/')
 def server():
     ip = request.headers.get('Client-IP')
-    ip = "hello"
+
     if ip_collection.find_one({"ip": ip}) == None:
-        ips.append(ip)
+
         t = time.time()
         x = t + 10
         y = t + 30
@@ -288,13 +290,13 @@ def server():
                 return "Too Many Requests", 429
             else:
                 ip_collection.delete_one({'ip': ip})
-                ips.remove(ip)
+
         else:
             if round(t - time.time()) < 10:
                 ip_collection.update_one({'ip': ip}, {'$set': {"amount": k}})
             else:
                 ip_collection.delete_one({'ip': ip})
-                ips.remove(ip)
+
     verified_email = None
     if 'auth_token' in request.cookies:
         auth_token = request.cookies.get('auth_token')
@@ -433,10 +435,12 @@ def send_email():
         token = secrets.token_urlsafe(80)
         email_verification_tokens.insert_one({"user": user_credentials['username'], "token":token})
 
+        myurl = f"https://www.bottomhat.net/verify_email/{token}"
+
         message = {
             "from_email": "verify@bottomhat.net",
             "subject": "Please verify your email",
-            "text": f'To verify your email, click the following link: {url_for("verify_email", token=token, _external=True)}',
+            "text": f'To verify your email, click the following link: {myurl}',
             "to": [{"email": user_email}],
         }
         try:
