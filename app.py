@@ -435,7 +435,7 @@ def send_email():
         token = secrets.token_urlsafe(80)
         email_verification_tokens.insert_one({"user": user_credentials['username'], "token":token})
 
-        myurl = f"https://www.bottomhat.net/verify_email/{token}"
+        myurl = f"https://bottomhat.net/verify_email/{token}"
 
         message = {
             "from_email": "verify@bottomhat.net",
