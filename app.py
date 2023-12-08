@@ -362,7 +362,7 @@ def submit_quiz_question():
                     user = check['username']
                     ide = count_collection.find_one_and_update({"name": "counter"}, {"$inc": {"count": 1}}, upsert=True, return_document=True)["count"]
 
-                    title = html.escape(request.form.get('question-title'))
+                    title = html.escape(request.form.get('question-title'), quote=False)
                     option1 = html.escape(request.form.get('option1'))
                     option2 = html.escape(request.form.get('option2'))
                     option3 = html.escape(request.form.get('option3'))
